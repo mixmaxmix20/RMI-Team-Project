@@ -2,20 +2,10 @@ import java.io.Serializable;
 
 public class User implements Serializable {
     private String username;
-    private String email;
     private boolean isOnline;
 
-    public User(String username, String email) {
+    public User(String username) {
         this.username = username;
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public boolean isOnline() {
