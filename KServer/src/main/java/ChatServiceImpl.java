@@ -184,6 +184,11 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
         return userRooms;
     }
 
+    @Override
+    public List<User> getRegisteredUsers() throws RemoteException {
+        return new ArrayList<>(usersData.values());
+    }
+
     private void broadCastMessage(ChatRoom room, Message message) throws RemoteException {
         for (User participant : room.getParticipants()) {
             String username = participant.getUsername();

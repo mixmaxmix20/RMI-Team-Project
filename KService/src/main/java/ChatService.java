@@ -10,4 +10,5 @@ public interface ChatService extends Remote {
     ChatRoom createChatRoom(String roomName, List<String> participants) throws RemoteException;
     ChatRoom getOrCreateDirectMessage(String user1, String user2) throws RemoteException;
     List<ChatRoom> getUserChatRooms(String username) throws RemoteException;
+    List<User> getRegisteredUsers() throws RemoteException;
 }
