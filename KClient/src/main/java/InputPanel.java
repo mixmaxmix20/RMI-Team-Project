@@ -26,5 +26,6 @@ public class InputPanel extends JPanel {
 
     public void addSendButtonListener(ActionListener listener) {
         sendButton.addActionListener(listener);
+        textField.addActionListener(listener);
     }
 }
