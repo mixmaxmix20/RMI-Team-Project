@@ -56,7 +56,6 @@ public class ChatList extends JPanel {
         listModel.clear();
 
         for (ChatRoom cr : chatRooms) {
-            System.out.println(cr.getName());
             listModel.addElement(cr);
         }
     }

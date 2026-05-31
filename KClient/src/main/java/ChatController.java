@@ -15,6 +15,7 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
     private final ChatFrame view;
     private final User user;
     private ChatRoom currentChatroom;
+    private List<User> currentOnlineUsers = new ArrayList<>();
 
     public ChatController(ChatService service, ChatFrame view) throws RemoteException {
         super();
@@ -30,7 +31,7 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
 
         new Thread(() -> {
             try {
-                service.clientJoin(this, user);
+                currentOnlineUsers = service.clientJoin(this, user);
                 refreshUserChannels();
             } catch (RemoteException e) {
                 System.out.println("Błąd połączenia z serwerem: " + e.getMessage());
@@ -43,6 +44,21 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
         view.getChatList().addNewDMButtonListener(new NewDMButtonActionListener());
 
         view.getChatList().addListSelectionListener(new ChatListSelectionListener());
+
+        view.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                new Thread(() -> {
+                    try {
+                        service.clientLeave(ChatController.this, user);
+                    } catch (RemoteException ex) {
+                        System.err.println("Błąd podczas wylogowywania: " + ex.getMessage());
+                    } finally {
+                        System.exit(0);
+                    }
+                }).start();
+            }
+        });
     }
 
     private void refreshUserChannels() {
@@ -67,6 +83,7 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
     private void setCurrentChatroom(ChatRoom newChatroom) {
         if (newChatroom == null) return;
         currentChatroom = newChatroom;
+        refreshUserList();
         new Thread(() -> {
             try {
                 List<Message> messages = service.getChatHistory(newChatroom.getId());
@@ -82,6 +99,19 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
                 System.out.println("Błąd pobierania historii: " + e.getMessage());
             }
         }).start();
+    }
+
+    private void refreshUserList() {
+        if (currentChatroom == null) return;
+        List<User> participants = currentChatroom.getParticipants();
+        if (participants != null) {
+            for (User p : participants) {
+                boolean isOnline = currentOnlineUsers.stream()
+                        .anyMatch(u -> u.getUsername().equals(p.getUsername()));
+                p.setOnline(isOnline);
+            }
+        }
+        SwingUtilities.invokeLater(() -> view.getUserList().setUsers(participants));
     }
 
     private class SendButtonActionListener implements ActionListener {
@@ -195,6 +225,8 @@ public class ChatController extends UnicastRemoteObject implements ChatObserver 
 
     @Override
     public void updateOnlineUsers(List<User> users) throws RemoteException {
+        this.currentOnlineUsers = users;
+        refreshUserList();
     }
 
     @Override

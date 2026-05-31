@@ -6,10 +6,11 @@ public class ChatFrame extends JFrame {
     private JTextPane textPane;
     private InputPanel inputPanel;
     private ChatList chatList;
+    private UserList userList;
 
     public ChatFrame() {
         setTitle("Komunikator");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setSize(800, 600);
         setLocationRelativeTo(null);
 
@@ -25,6 +26,9 @@ public class ChatFrame extends JFrame {
         chatList = new ChatList();
         mainPanel.add(chatList, BorderLayout.WEST);
 
+        userList = new UserList();
+        mainPanel.add(userList, BorderLayout.EAST);
+
         inputPanel = new InputPanel();
         mainPanel.add(inputPanel, BorderLayout.SOUTH);
 
@@ -37,6 +41,10 @@ public class ChatFrame extends JFrame {
 
     public ChatList getChatList() {
         return chatList;
+    }
+
+    public UserList getUserList() {
+        return userList;
     }
 
     public void appendMessage(String message) {
