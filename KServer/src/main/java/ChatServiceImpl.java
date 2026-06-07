@@ -93,7 +93,7 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
 
         stateLock.lock();
         try {
-            activeClients.remove(username);
+            activeClients.remove(username, client);
             User savedUser = usersData.get(username);
             if (savedUser != null) {
                 savedUser.setOnline(false);
@@ -199,7 +199,7 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
                     chatObserver.receiveMessage(message);
                 } catch (RemoteException e) {
                     System.out.println("Utracono połączenie z klientem: " + username);
-                    activeClients.remove(username);
+                    activeClients.remove(username, chatObserver);
                     User disconnectedUser = usersData.get(username);
                     disconnectedUser.setOnline(false);
                 }
@@ -220,7 +220,7 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
                 observer.updateOnlineUsers(onlineUsers);
             } catch (RemoteException e) {
                 System.err.println("Błąd powiadomienia dla: " + username);
-                activeClients.remove(username);
+                activeClients.remove(username, observer);
                 User u = usersData.get(username);
                 u.setOnline(false);
             }
@@ -237,7 +237,7 @@ public class ChatServiceImpl extends UnicastRemoteObject implements ChatService 
                     chatObserver.notifyAddedToChatRoom(chatRoom);
                 } catch (RemoteException e) {
                     System.err.println("Błąd powiadomienia dla: " + username);
-                    activeClients.remove(username);
+                    activeClients.remove(username, chatObserver);
                     User disconnectedUser = usersData.get(username);
                     disconnectedUser.setOnline(false);
                 }
