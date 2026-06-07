@@ -72,7 +72,7 @@ public class ConcurrencyTest {
             final String senderName = "User_" + i;
             executor.submit(() -> {
                 try {
-                    startLatch.await(); // Czekaj na sygnał startu
+                    startLatch.await();
                     for (int m = 0; m < messagesPerClient; m++) {
                         Message msg = new Message(roomId, "Wiadomość testowa " + m, senderName);
                         server.sendMessage(msg);
